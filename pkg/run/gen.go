@@ -123,7 +123,11 @@ func Gen(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse derivation path: %w", err)
 	}
+
 	account, err := wallet.Derive(path, false)
+	if err != nil {
+		return fmt.Errorf("failed to derive account from path: %w", err)
+	}
 
 	prvHex, err := wallet.PrivateKeyHex(account)
 	if err != nil {
