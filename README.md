@@ -64,3 +64,28 @@ Enter mnemonic: this is an invalid mnemonic
 pub: 0xc1541003D25C206873F5c28Ea684E1072026FC9A
 prv: fc30faae343aba4a5151a56881e9c4ff332563fa8eedda661a7681db4ea604bb
 ```
+
+## validate keys
+Key validation checks for key string format, length and other characteristics.
+For instance, if a private key is entered, it also checks if a public key
+can be derived from it.
+
+```bash
+ethkey gen
+Enter mnemonic: few happy dragon spray much obvious total drive hat brain impose bright test there outside peasant share kitchen prefer inmate moment cactus forward crisp
+pub: 0x0dD73dE2AC23E6f4928D582aa6510144790DA88e
+prv: 70f18df4c72c80a4c0bd47c6ec1b61dd4251c9a77104150c891f8d27a96beb73
+```
+
+These keys can be validated:
+```bash
+ethkey validate 
+Enter prv or pub key: 0x0dD73dE2AC23E6f4928D582aa6510144790DA88e
+public key is valid
+```
+
+```bash
+ethkey validate 
+Enter prv or pub key: 70f18df4c72c80a4c0bd47c6ec1b61dd4251c9a77104150c891f8d27a96beb73
+private key is valid with public address: 0x0dD73dE2AC23E6f4928D582aa6510144790DA88e
+```
