@@ -3,6 +3,7 @@ module github.com/kubetrail/ethkey
 go 1.17
 
 require (
+	github.com/ethereum/go-ethereum v1.10.4
 	github.com/miguelmota/go-ethereum-hdwallet v0.1.1
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
@@ -13,7 +14,6 @@ require (
 require (
 	github.com/btcsuite/btcd v0.21.0-beta // indirect
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce // indirect
-	github.com/ethereum/go-ethereum v1.10.4 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
