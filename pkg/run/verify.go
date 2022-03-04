@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubetrail/ethkey/pkg/flags"
-	"github.com/spf13/viper"
-
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func Verify(cmd *cobra.Command, args []string) error {
