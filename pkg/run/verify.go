@@ -2,12 +2,12 @@ package run
 
 import (
 	"bufio"
-	"encoding/hex"
 	"fmt"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kubetrail/ethkey/pkg/flags"
+	"github.com/mr-tron/base58"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -73,12 +73,12 @@ func Verify(cmd *cobra.Command, args []string) error {
 		sign = strings.Trim(sign, "\n")
 	}
 
-	hashBytes, err := hex.DecodeString(hash)
+	hashBytes, err := base58.Decode(hash)
 	if err != nil {
 		return fmt.Errorf("failed to decode hash: %w", err)
 	}
 
-	signBytes, err := hex.DecodeString(sign)
+	signBytes, err := base58.Decode(sign)
 	if err != nil {
 		return fmt.Errorf("failed to decode signature: %w", err)
 	}
