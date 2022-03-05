@@ -2,7 +2,6 @@ package run
 
 import (
 	"bufio"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kubetrail/ethkey/pkg/flags"
+	"github.com/mr-tron/base58"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -67,8 +67,8 @@ func Sign(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to sign input data hash: %w", err)
 	}
 
-	hashHex := hex.EncodeToString(hash)
-	signHex := hex.EncodeToString(sign)
+	hashHex := base58.Encode(hash)
+	signHex := base58.Encode(sign)
 
 	if prompt {
 		if _, err := fmt.Fprintln(cmd.OutOrStdout(), "hash: ", hashHex); err != nil {

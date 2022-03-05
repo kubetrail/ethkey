@@ -1,7 +1,6 @@
 package run
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/kubetrail/ethkey/pkg/flags"
+	"github.com/mr-tron/base58"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -42,7 +42,7 @@ func Hash(cmd *cobra.Command, args []string) error {
 	}
 
 	hash := crypto.Keccak256(b)
-	hashHex := hex.EncodeToString(hash)
+	hashHex := base58.Encode(hash)
 
 	if prompt {
 		if _, err := fmt.Fprintln(cmd.OutOrStdout(), "hash: ", hashHex); err != nil {

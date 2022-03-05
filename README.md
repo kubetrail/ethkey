@@ -96,22 +96,21 @@ public key
 ```bash
 ethkey sign this arbitrary input
 Enter prv key: 70f18df4c72c80a4c0bd47c6ec1b61dd4251c9a77104150c891f8d27a96beb73
-hash:  7ca1289bf6422de5ad2582e0d53c3aa3f2e48e59cfd56db0aa54812b425f7b78
-sign:  af381e4292e36ab9f4645c1a78614f54ca1d1e782940351cd1d1ad730b8ff47e5854c2d3e8308bc2bf096271156f7a8ca1ee67745c18b5c5e20557b5c18c3c8600
+hash:  9PW5sgZmMnaBYgJxUQASyDQoeKoxPcgBLvCJEHVEFqb5
+sign:  GTpQzCsxorDxhWykp4CJPdimV5VKQ9Jqm1xsJsusYGFCuDKHVjVG5dCeVZG8Qu27AfTYUShewRiT5tERohQUMhbTu
 ```
 
 ## verify signature
 ```bash
-ethkey verify
+ethkey verify 
 Enter pub key: 0x0dD73dE2AC23E6f4928D582aa6510144790DA88e
-Enter hash: 7ca1289bf6422de5ad2582e0d53c3aa3f2e48e59cfd56db0aa54812b425f7b78
-Enter sign: af381e4292e36ab9f4645c1a78614f54ca1d1e782940351cd1d1ad730b8ff47e5854c2d3e8308bc2bf096271156f7a8ca1ee67745c18b5c5e20557b5c18c3c8600
+Enter hash: 9PW5sgZmMnaBYgJxUQASyDQoeKoxPcgBLvCJEHVEFqb5
+Enter sign: GTpQzCsxorDxhWykp4CJPdimV5VKQ9Jqm1xsJsusYGFCuDKHVjVG5dCeVZG8Qu27AfTYUShewRiT5tERohQUMhbTu
 signature is valid for given hash and public key
 ```
-
 ## generate hash
 Hash can be generated for an input
 ```bash
 ethkey hash this arbitrary input
-hash:  7ca1289bf6422de5ad2582e0d53c3aa3f2e48e59cfd56db0aa54812b425f7b78
+hash:  9PW5sgZmMnaBYgJxUQASyDQoeKoxPcgBLvCJEHVEFqb5
 ```
