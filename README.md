@@ -9,8 +9,7 @@ Generate Ethereum keys using mnemonics
 This step assumes you have [Go compiler toolchain](https://go.dev/dl/)
 installed on your system.
 
-Download this repo to a folder and cd to it. Make sure `go` toolchain
-is installed
+Download this repo to a folder and cd to it. 
 ```bash
 go install
 ```
