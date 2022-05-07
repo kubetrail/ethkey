@@ -1,102 +1,94 @@
 package run
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/kubetrail/bip32/pkg/keys"
+	"github.com/kubetrail/bip39/pkg/prompts"
 	"github.com/kubetrail/ethkey/pkg/flags"
-	"github.com/mr-tron/base58"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 func Sign(cmd *cobra.Command, args []string) error {
-	_ = viper.BindPFlag(flags.Filename, cmd.Flags().Lookup(flags.Filename))
-	fileName := viper.GetString(flags.Filename)
+	persistentFlags := getPersistentFlags(cmd)
 
-	prompt, err := getPromptStatus()
+	_ = viper.BindPFlag(flags.Hash, cmd.Flags().Lookup(flags.Hash))
+	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
+
+	hash := viper.GetString(flags.Hash)
+	key := viper.GetString(flags.Key)
+
+	prompt, err := prompts.Status()
 	if err != nil {
 		return fmt.Errorf("failed to get prompt status: %w", err)
 	}
 
-	if prompt {
-		if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter prv key: "); err != nil {
-			return fmt.Errorf("failed to write to output: %w", err)
+	if len(key) == 0 {
+		if prompt {
+			if err := keys.Prompt(cmd.OutOrStdout()); err != nil {
+				return fmt.Errorf("failed to prompt for key: %w", err)
+			}
+		}
+
+		key, err = keys.Read(cmd.InOrStdin())
+		if err != nil {
+			return fmt.Errorf("failed to read key from input: %w", err)
 		}
 	}
-
-	inputReader := bufio.NewReader(cmd.InOrStdin())
-	key, err := inputReader.ReadString('\n')
-	if err != nil {
-		return fmt.Errorf("failed to read mnemonic from input: %w", err)
-	}
-	key = strings.Trim(key, "\n")
 
 	privateKey, err := crypto.HexToECDSA(key)
 	if err != nil {
 		return fmt.Errorf("invalid private key: %w", err)
 	}
 
-	var b []byte
-	if len(fileName) > 0 {
-		if fileName == "-" {
-			if b, err = io.ReadAll(cmd.InOrStdin()); err != nil {
-				return fmt.Errorf("failed to read stdin input: %w", err)
-			}
-		} else {
-			if b, err = os.ReadFile(fileName); err != nil {
-				return fmt.Errorf("failed to read input file %s: %w", fileName, err)
-			}
-		}
-	} else {
-		if len(args) == 0 {
-			return fmt.Errorf("no input file or args, pl. provide input to sign")
-		}
-		b = []byte(strings.Join(args, " "))
+	if !keys.IsValidBase58String(hash) {
+		return fmt.Errorf("hash is not a valid base58 string")
 	}
 
-	hash := crypto.Keccak256(b)
-
-	sign, err := crypto.Sign(hash, privateKey)
+	sign, err := crypto.Sign(base58.Decode(hash), privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign input data hash: %w", err)
 	}
 
-	hashHex := base58.Encode(hash)
 	signHex := base58.Encode(sign)
 
-	if prompt {
-		if _, err := fmt.Fprintln(cmd.OutOrStdout(), "hash: ", hashHex); err != nil {
-			return fmt.Errorf("failed to write to output: %w", err)
-		}
-
-		if _, err := fmt.Fprintln(cmd.OutOrStdout(), "sign: ", signHex); err != nil {
-			return fmt.Errorf("failed to write to output: %w", err)
-		}
-
-		return nil
+	type output struct {
+		Sign string `json:"sign,omitempty" yaml:"sign,omitempty"`
 	}
 
-	jb, err := json.Marshal(
-		struct {
-			Hash string `json:"hash,omitempty"`
-			Sign string `json:"sign,omitempty"`
-		}{
-			Hash: hashHex,
-			Sign: signHex,
-		},
-	)
-	if err != nil {
-		return fmt.Errorf("failed to serialize output: %w", err)
-	}
+	out := &output{Sign: signHex}
 
-	if _, err := fmt.Fprintln(cmd.OutOrStdout(), string(jb)); err != nil {
-		return fmt.Errorf("failed to write to output: %w", err)
+	switch strings.ToLower(persistentFlags.OutputFormat) {
+	case flags.OutputFormatNative:
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), signHex); err != nil {
+			return fmt.Errorf("failed to write signature to output: %w", err)
+		}
+	case flags.OutputFormatYaml:
+		jb, err := yaml.Marshal(out)
+		if err != nil {
+			return fmt.Errorf("failed to serialize output to yaml: %w", err)
+		}
+
+		if _, err := fmt.Fprint(cmd.OutOrStdout(), string(jb)); err != nil {
+			return fmt.Errorf("failed to write signature to output: %w", err)
+		}
+	case flags.OutputFormatJson:
+		jb, err := json.Marshal(out)
+		if err != nil {
+			return fmt.Errorf("failed to serialize output to json: %w", err)
+		}
+
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), string(jb)); err != nil {
+			return fmt.Errorf("failed to write signature to output: %w", err)
+		}
+	default:
+		return fmt.Errorf("failed to format in requested format, %s is not supported", persistentFlags.OutputFormat)
 	}
 
 	return nil

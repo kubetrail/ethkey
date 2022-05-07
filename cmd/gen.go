@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/kubetrail/bip39/pkg/mnemonics"
 	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/kubetrail/ethkey/pkg/run"
 	"github.com/spf13/cobra"
@@ -51,4 +52,5 @@ func init() {
 	f.Bool(flags.UsePassphrase, false, "Prompt for secret passphrase")
 	f.Bool(flags.InputHexSeed, false, "Treat input as hex seed instead of mnemonic")
 	f.Bool(flags.SkipMnemonicValidation, false, "Skip mnemonic validation")
+	f.String(flags.MnemonicLanguage, mnemonics.LanguageEnglish, "Mnemonic language")
 }

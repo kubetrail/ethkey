@@ -29,6 +29,7 @@ Enter private or public key strings and it will parse
 accordingly. When private key is entered, it also checks
 if a public key can be derived from it.`,
 	RunE: run.Validate,
+	Args: cobra.MaximumNArgs(1),
 }
 
 func init() {
