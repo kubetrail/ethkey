@@ -1,35 +1,34 @@
 package run
 
 import (
-	"bufio"
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/btcsuite/btcutil/base58"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/kubetrail/bip32/pkg/keys"
+	"github.com/kubetrail/bip39/pkg/prompts"
 	"github.com/kubetrail/ethkey/pkg/flags"
-	"github.com/mr-tron/base58"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 func Verify(cmd *cobra.Command, args []string) error {
+	persistentFlags := getPersistentFlags(cmd)
+
 	_ = viper.BindPFlag(flags.Hash, cmd.Flags().Lookup(flags.Hash))
 	_ = viper.BindPFlag(flags.Sign, cmd.Flags().Lookup(flags.Sign))
-	_ = viper.BindPFlag(flags.PubKey, cmd.Flags().Lookup(flags.PubKey))
+	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
 
 	hash := viper.GetString(flags.Hash)
 	sign := viper.GetString(flags.Sign)
-	key := viper.GetString(flags.PubKey)
+	key := viper.GetString(flags.Key)
 
-	printOk := false
-	if len(hash) == 0 ||
-		len(sign) == 0 ||
-		len(key) == 0 {
-		printOk = true
-	}
+	var verified bool
 
-	inputReader := bufio.NewReader(cmd.InOrStdin())
-	prompt, err := getPromptStatus()
+	prompt, err := prompts.Status()
 	if err != nil {
 		return fmt.Errorf("failed to get prompt status: %w", err)
 	}
@@ -40,11 +39,10 @@ func Verify(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("failed to write to output: %w", err)
 			}
 		}
-		key, err = inputReader.ReadString('\n')
+		key, err = keys.Read(cmd.InOrStdin())
 		if err != nil {
 			return fmt.Errorf("failed to read pub key from input: %w", err)
 		}
-		key = strings.Trim(key, "\n")
 	}
 
 	if len(hash) == 0 {
@@ -53,11 +51,10 @@ func Verify(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("failed to write to output: %w", err)
 			}
 		}
-		hash, err = inputReader.ReadString('\n')
+		hash, err = keys.Read(cmd.InOrStdin())
 		if err != nil {
 			return fmt.Errorf("failed to read hash from input: %w", err)
 		}
-		hash = strings.Trim(hash, "\n")
 	}
 
 	if len(sign) == 0 {
@@ -66,37 +63,61 @@ func Verify(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("failed to write to output: %w", err)
 			}
 		}
-		sign, err = inputReader.ReadString('\n')
+		sign, err = keys.Read(cmd.InOrStdin())
 		if err != nil {
-			return fmt.Errorf("failed to read sign from input: %w", err)
+			return fmt.Errorf("failed to read signature from input: %w", err)
 		}
-		sign = strings.Trim(sign, "\n")
 	}
 
-	hashBytes, err := base58.Decode(hash)
-	if err != nil {
-		return fmt.Errorf("failed to decode hash: %w", err)
+	if !keys.IsValidBase58String(hash) {
+		return fmt.Errorf("hash is not a valid base58 string")
 	}
 
-	signBytes, err := base58.Decode(sign)
-	if err != nil {
-		return fmt.Errorf("failed to decode signature: %w", err)
+	if !keys.IsValidBase58String(sign) {
+		return fmt.Errorf("signature is not a valid base58 string")
 	}
 
-	pubKey, err := crypto.SigToPub(hashBytes, signBytes)
+	pubKey, err := crypto.SigToPub(base58.Decode(hash), base58.Decode(sign))
 	if err != nil {
 		return fmt.Errorf("failed to derive public key from hash and sign: %w", err)
 	}
 
 	address := crypto.PubkeyToAddress(*pubKey)
-	if address.Hex() != key {
-		return fmt.Errorf("public key of signature for given hash does not match input public key")
+	if address.Hex() == key {
+		verified = true
 	}
 
-	if printOk {
-		if _, err := fmt.Fprintln(cmd.OutOrStdout(), "signature is valid for given hash and public key"); err != nil {
-			return fmt.Errorf("failed to write to output: %w", err)
+	type output struct {
+		Verified bool `json:"verified" yaml:"verified"`
+	}
+
+	out := &output{Verified: verified}
+
+	switch strings.ToLower(persistentFlags.OutputFormat) {
+	case flags.OutputFormatNative:
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), verified); err != nil {
+			return fmt.Errorf("failed to write signature verification to output: %w", err)
 		}
+	case flags.OutputFormatYaml:
+		jb, err := yaml.Marshal(out)
+		if err != nil {
+			return fmt.Errorf("failed to serialize output to yaml: %w", err)
+		}
+
+		if _, err := fmt.Fprint(cmd.OutOrStdout(), string(jb)); err != nil {
+			return fmt.Errorf("failed to write signature verification to output: %w", err)
+		}
+	case flags.OutputFormatJson:
+		jb, err := json.Marshal(out)
+		if err != nil {
+			return fmt.Errorf("failed to serialize output to json: %w", err)
+		}
+
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), string(jb)); err != nil {
+			return fmt.Errorf("failed to write signature verification to output: %w", err)
+		}
+	default:
+		return fmt.Errorf("failed to format in requested format, %s is not supported", persistentFlags.OutputFormat)
 	}
 
 	return nil

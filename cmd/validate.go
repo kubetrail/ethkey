@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/kubetrail/ethkey/pkg/run"
 	"github.com/spf13/cobra"
 )
@@ -29,8 +30,12 @@ Enter private or public key strings and it will parse
 accordingly. When private key is entered, it also checks
 if a public key can be derived from it.`,
 	RunE: run.Validate,
+	Args: cobra.MaximumNArgs(1),
 }
 
 func init() {
 	rootCmd.AddCommand(validateCmd)
+	f := validateCmd.Flags()
+
+	f.String(flags.Key, "", "key, private or public")
 }

@@ -1,20 +1,23 @@
 package run
 
 import (
-	"fmt"
-	"os"
+	"github.com/kubetrail/ethkey/pkg/flags"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-func getPromptStatus() (bool, error) {
-	prompt := false
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		return false, fmt.Errorf("failed ot stat stdin")
-	}
+type persistentFlagValues struct {
+	OutputFormat string `json:"outputFormat,omitempty"`
+}
 
-	if fi.Mode()&os.ModeNamedPipe == 0 {
-		prompt = true
-	}
+func getPersistentFlags(cmd *cobra.Command) persistentFlagValues {
+	rootCmd := cmd.Root().PersistentFlags()
 
-	return prompt, nil
+	_ = viper.BindPFlag(flags.OutputFormat, rootCmd.Lookup(flags.OutputFormat))
+
+	outputFormat := viper.GetString(flags.OutputFormat)
+
+	return persistentFlagValues{
+		OutputFormat: outputFormat,
+	}
 }

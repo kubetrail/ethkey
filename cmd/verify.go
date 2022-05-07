@@ -37,5 +37,5 @@ func init() {
 
 	f.String(flags.Hash, "", "Hash of input data")
 	f.String(flags.Sign, "", "Signature of hash")
-	f.String(flags.PubKey, "", "Public key")
+	f.String(flags.Key, "", "Public key")
 }

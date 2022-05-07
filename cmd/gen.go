@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/kubetrail/bip39/pkg/mnemonics"
 	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/kubetrail/ethkey/pkg/run"
 	"github.com/spf13/cobra"
@@ -28,6 +29,10 @@ var genCmd = &cobra.Command{
 	Long: `This command generates private/public keys
 from mnemonic and optional secret passphrase per BIP-32 spec.
 
+Alternatively, a seed in hex format can be provided bypassing
+all mnemonic related computation and be directly used for
+key generation
+
 The keys are generated based on a chain derivation path
 Path     |   Remark
 ---------|--------------------------------------------------------------
@@ -37,8 +42,24 @@ m/0'     |   First hardened child of master key
 m/0/0    |   First child of first child of master key
 m/0'/0   |   First child of first hardened child of master key
 m/0/0'   |   First hardened child of first child of master key
-m/0'/0'  |   First hardened child of first hardened child of master key'
+m/0'/0'  |   First hardened child of first hardened child of master key
 
+Mnemonic language can be specified from the following list:
+1. English (default)
+2. Japanese
+3. ChineseSimplified
+4. ChineseTraditional
+5. Czech
+6. French
+7. Italian
+8. Korean
+9. Spanish
+
+BIP-39 proposal: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
+
+Please note that same keys will be generated for mnemonics from different languages
+if the underlying entropy is the same. In other words, keys are always
+generated after translating input mnemonic to English.
 `,
 	RunE: run.Gen,
 }
@@ -51,4 +72,5 @@ func init() {
 	f.Bool(flags.UsePassphrase, false, "Prompt for secret passphrase")
 	f.Bool(flags.InputHexSeed, false, "Treat input as hex seed instead of mnemonic")
 	f.Bool(flags.SkipMnemonicValidation, false, "Skip mnemonic validation")
+	f.String(flags.MnemonicLanguage, mnemonics.LanguageEnglish, "Mnemonic language")
 }

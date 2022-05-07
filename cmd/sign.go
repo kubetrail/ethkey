@@ -27,11 +27,13 @@ var signCmd = &cobra.Command{
 	Short: "Sign input",
 	Long:  `This command signs input using private key`,
 	RunE:  run.Sign,
+	Args:  cobra.MaximumNArgs(0),
 }
 
 func init() {
 	rootCmd.AddCommand(signCmd)
 	f := signCmd.Flags()
 
-	f.String(flags.Filename, "", "Input file to sign")
+	f.String(flags.Hash, "", "Hash of input data")
+	f.String(flags.Key, "", "Private key")
 }
