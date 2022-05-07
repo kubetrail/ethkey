@@ -36,6 +36,11 @@ pub: 0x33009656efD3e4eA8763B72B020C2327Dee0B2db
 prv: 12bea0236685f934e39e27bef1793966800f882912c099b4c584a8fbfd28b6e1
 ```
 
+Alternatively, pass mnemonic as CLI args
+```bash
+ethkey gen patient board palm abandon right sort find blood grace sweet vote load action bag trash calm burden glow phrase shoot frog vacant elegant tourist
+```
+
 The default chain derivation path is `m/44'/60'/0'/0/0`, were `60'` stands for
 hardened Ethereum chain address and `44'` stands for hardened purpose, implying
 `BIP-44` spec.
@@ -62,8 +67,28 @@ pub: 0x810d963eC3C2DfD299E089C42cc7d07089FA5eD2
 prv: dd0808b874693a136384b0f4cf923b6caf59a5068bb8bfeb1e38420b86f22f6f
 ```
 
-Mnemonic is validated and expected to comply to `BIP-39` standard, however, an 
-arbitrary mnemonic can be used by switching off validation
+Mnemonic is validated and expected to comply to `BIP-39` standard.
+Furthermore, a mnemonic in a language different from English is first
+translated to English such that the underlying entropy is preserved.
+
+```bash
+bip39 translate --to-language=Japanese patient board palm abandon right sort find blood grace sweet vote load action bag trash calm burden glow phrase shoot frog vacant elegant tourist
+```
+```text
+てぶくろ うりきれ てすり あいこくしん ねむい ひりつ こんしゅう うやまう しねん ほうそう らいう そんぞく あつい いわば むかい おおよそ おいこす しちりん でんち はんい さとる やめる けらい みのがす
+```
+
+Now using the Japenese mnemonic will result in same keys as those generated using
+it's English mnemonic equivalent:
+```bash
+ethkey gen --mnemonic-language=Japanese てぶくろ うりきれ てすり あいこくしん ねむい ひりつ こんしゅう うやまう しねん ほうそう らいう そんぞく あつい いわば むかい おおよそ おいこす しちりん でんち はんい さとる やめる けらい みのがす
+```
+```yaml
+prv: 12bea0236685f934e39e27bef1793966800f882912c099b4c584a8fbfd28b6e1
+pub: 0x33009656efD3e4eA8763B72B020C2327Dee0B2db
+```
+
+However, an arbitrary mnemonic can be used by switching off validation
 
 ```bash
 ethkey gen --skip-mnemonic-validation
@@ -73,6 +98,9 @@ Enter mnemonic: this is an invalid mnemonic
 pub: 0xc1541003D25C206873F5c28Ea684E1072026FC9A
 prv: fc30faae343aba4a5151a56881e9c4ff332563fa8eedda661a7681db4ea604bb
 ```
+
+> It is a good practice to use valid mnemonics and also enter them
+> via STDIN to avoid getting them captured in command history
 
 ## validate keys
 Key validation checks for key string format, length and other characteristics.
