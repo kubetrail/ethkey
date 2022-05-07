@@ -48,7 +48,7 @@ func Gen(cmd *cobra.Command, args []string) error {
 	}
 
 	if inputHexSeed && skipMnemonicValidation {
-		return fmt.Errorf("dont use --skip-mnemonic-validation when entering seed")
+		return fmt.Errorf("cannot use --skip-mnemonic-validation when entering seed")
 	}
 
 	if !inputHexSeed {

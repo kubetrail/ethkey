@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/kubetrail/ethkey/pkg/run"
 	"github.com/spf13/cobra"
 )
@@ -34,4 +35,7 @@ if a public key can be derived from it.`,
 
 func init() {
 	rootCmd.AddCommand(validateCmd)
+	f := validateCmd.Flags()
+
+	f.String(flags.Key, "", "key, private or public")
 }

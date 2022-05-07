@@ -12,33 +12,38 @@ import (
 	"github.com/kubetrail/bip39/pkg/prompts"
 	"github.com/kubetrail/ethkey/pkg/flags"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
 
 func Validate(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
+	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
+	key := viper.GetString(flags.Key)
+
 	prompt, err := prompts.Status()
 	if err != nil {
 		return fmt.Errorf("failed to get prompt status: %w", err)
 	}
 
-	var key string
 	var valid bool
 
-	if len(args) == 0 {
-		if prompt {
-			if err := keys.Prompt(cmd.OutOrStdout()); err != nil {
-				return fmt.Errorf("failed to prompt for key: %w", err)
+	if len(key) == 0 {
+		if len(args) == 0 {
+			if prompt {
+				if err := keys.Prompt(cmd.OutOrStdout()); err != nil {
+					return fmt.Errorf("failed to prompt for key: %w", err)
+				}
 			}
-		}
 
-		key, err = keys.Read(cmd.InOrStdin())
-		if err != nil {
-			return fmt.Errorf("failed to read key from input: %w", err)
+			key, err = keys.Read(cmd.InOrStdin())
+			if err != nil {
+				return fmt.Errorf("failed to read key from input: %w", err)
+			}
+		} else {
+			key = args[0]
 		}
-	} else {
-		key = args[0]
 	}
 
 	if len(key) < 2 {
@@ -73,7 +78,7 @@ func Validate(cmd *cobra.Command, args []string) error {
 
 	switch strings.ToLower(persistentFlags.OutputFormat) {
 	case flags.OutputFormatNative:
-		if _, err := fmt.Fprint(cmd.OutOrStdout(), valid); err != nil {
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), valid); err != nil {
 			return fmt.Errorf("failed to write key validity to output: %w", err)
 		}
 	case flags.OutputFormatYaml:
