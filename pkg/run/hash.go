@@ -19,7 +19,7 @@ import (
 func Hash(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
-	_ = viper.BindPFlag(flags.Filename, cmd.Flags().Lookup(flags.Filename))
+	_ = viper.BindPFlag(flags.Filename, cmd.Flag(flags.Filename))
 	fileName := viper.GetString(flags.Filename)
 
 	prompt, err := prompts.Status()

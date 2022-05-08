@@ -19,7 +19,7 @@ import (
 func Validate(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
-	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
+	_ = viper.BindPFlag(flags.Key, cmd.Flag(flags.Key))
 	key := viper.GetString(flags.Key)
 
 	prompt, err := prompts.Status()
