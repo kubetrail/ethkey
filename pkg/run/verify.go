@@ -18,9 +18,9 @@ import (
 func Verify(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
-	_ = viper.BindPFlag(flags.Hash, cmd.Flags().Lookup(flags.Hash))
-	_ = viper.BindPFlag(flags.Sign, cmd.Flags().Lookup(flags.Sign))
-	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
+	_ = viper.BindPFlag(flags.Hash, cmd.Flag(flags.Hash))
+	_ = viper.BindPFlag(flags.Sign, cmd.Flag(flags.Sign))
+	_ = viper.BindPFlag(flags.Key, cmd.Flag(flags.Key))
 
 	hash := viper.GetString(flags.Hash)
 	sign := viper.GetString(flags.Sign)

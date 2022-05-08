@@ -18,8 +18,8 @@ import (
 func Sign(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
-	_ = viper.BindPFlag(flags.Hash, cmd.Flags().Lookup(flags.Hash))
-	_ = viper.BindPFlag(flags.Key, cmd.Flags().Lookup(flags.Key))
+	_ = viper.BindPFlag(flags.Hash, cmd.Flag(flags.Hash))
+	_ = viper.BindPFlag(flags.Key, cmd.Flag(flags.Key))
 
 	hash := viper.GetString(flags.Hash)
 	key := viper.GetString(flags.Key)
