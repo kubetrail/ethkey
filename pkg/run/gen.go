@@ -17,6 +17,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	keyPrefix = "04"
+	keyType   = "ecdsa"
+)
+
+type output struct {
+	Seed    string `json:"seed,omitempty" yaml:"seed,omitempty"`
+	PrvHex  string `json:"prvHex,omitempty" yaml:"prvHex,omitempty"`
+	PubHex  string `json:"pubHex,omitempty" yaml:"pubHex,omitempty"`
+	Addr    string `json:"addr,omitempty" yaml:"addr,omitempty"`
+	KeyType string `json:"keyType,omitempty" yaml:"keyType,omitempty"`
+}
+
 func Gen(cmd *cobra.Command, args []string) error {
 	persistentFlags := getPersistentFlags(cmd)
 
@@ -124,17 +137,17 @@ func Gen(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to generate private key for account: %w", err)
 	}
 
-	outPrv := fmt.Sprintf("%s", prvHex)
-	outPub := fmt.Sprintf("%s", account.Address.Hex())
-
-	type output struct {
-		Prv string `json:"prv,omitempty" yaml:"prv,omitempty"`
-		Pub string `json:"pub,omitempty" yaml:"pub,omitempty"`
+	pubHex, err := wallet.PublicKeyHex(account)
+	if err != nil {
+		return fmt.Errorf("failed to derive public key from wallet: %w", err)
 	}
 
 	out := &output{
-		Prv: outPrv,
-		Pub: outPub,
+		KeyType: keyType,
+		Seed:    hex.EncodeToString(seed),
+		PrvHex:  prvHex,
+		PubHex:  pubHex,
+		Addr:    account.Address.Hex(),
 	}
 
 	switch strings.ToLower(persistentFlags.OutputFormat) {

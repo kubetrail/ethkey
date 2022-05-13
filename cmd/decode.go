@@ -21,21 +21,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// validateCmd represents the validate command
-var validateCmd = &cobra.Command{
-	Use:   "validate",
-	Short: "Validate prv or pub key",
-	Long: `This command checks if a key is valid.
-Enter private or public key strings and it will parse
-accordingly. When private key is entered, it also checks
-if a public key can be derived from it.`,
-	RunE: run.Validate,
-	Args: cobra.MaximumNArgs(1),
+// decodeCmd represents the decode command
+var decodeCmd = &cobra.Command{
+	Use:   "decode",
+	Short: "Decode key",
+	Long:  `Decode key to derive address`,
+	RunE:  run.Decode,
+	Args:  cobra.MaximumNArgs(1),
 }
 
 func init() {
-	rootCmd.AddCommand(validateCmd)
-	f := validateCmd.Flags()
+	rootCmd.AddCommand(decodeCmd)
+	f := decodeCmd.Flags()
 
-	f.String(flags.Key, "", "key, private or public")
+	f.String(flags.Key, "", "Private or public key")
 }
