@@ -1,6 +1,8 @@
 package run
 
 import (
+	"crypto/elliptic"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -83,8 +85,17 @@ func Verify(cmd *cobra.Command, args []string) error {
 	}
 
 	address := crypto.PubkeyToAddress(*pubKey)
-	if address.Hex() == key {
-		verified = true
+	switch strings.ToLower(key[:2]) {
+	case "0x":
+		if address.Hex() == key {
+			verified = true
+		}
+	default:
+		b := elliptic.Marshal(pubKey.Curve, pubKey.X, pubKey.Y)
+		pubHex := hex.EncodeToString(b)
+		if pubHex[2:] == key {
+			verified = true
+		}
 	}
 
 	type output struct {

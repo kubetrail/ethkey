@@ -44,6 +44,11 @@ m/0'/0   |   First child of first hardened child of master key
 m/0/0'   |   First hardened child of first child of master key
 m/0'/0'  |   First hardened child of first hardened child of master key
 
+Per BIP-44 spec, the derivation path for ETH takes the form:
+m/44'/60'/0'/0/0, where 44 refers to the purpose being satisfying
+BIP-44 spec, 60 being the ETH blockchain identifier and rest of the
+items being specific to account.
+
 Mnemonic language can be specified from the following list:
 1. English (default)
 2. Japanese
@@ -60,6 +65,23 @@ BIP-39 proposal: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
 Please note that same keys will be generated for mnemonics from different languages
 if the underlying entropy is the same. In other words, keys are always
 generated after translating input mnemonic to English.
+
+To generate keys, first optionally create a new mnemonic:
+$ bip39 gen --length=12
+cushion cover cupboard brother quiz board busy loyal kidney slogan catch pencil
+
+Then use the mnemonic to create the ETH keys:
+$ ethkey gen
+Enter mnemonic: cushion cover cupboard brother quiz board busy loyal kidney slogan catch pencil
+seed: c80211bbdee485ca4e7c9039847be4ee004d93af33a1589a250ac8bdaaa597305fbc2b8bdc89d6d6dbf9fd5c285c9bd540d67aa89882b1633b5f6abaf4abb898
+prvHex: ed234d0929176fc58f699be15c7f606f745223d93ceb3b4042e55e825484c043
+pubHex: d1b975977b838babda7675859fa1958c94a0a9c0615e0cdcb10ac270ce61f6147c3e204443048026d63b84fdcf4398cebf077773815f50727fa46459c011d6a5
+addr: 0xAE600D1F94680Ef43Ab12F8d618F8aAfC208FE25
+keyType: ecdsa
+
+An ecdsa private/public key pair is generated and corresponding address is derived.
+Please note that public key hex string is missing prefix 04 in case you are trying to
+unmarshal it separately to raw Public key data structure.
 `,
 	RunE: run.Gen,
 }
