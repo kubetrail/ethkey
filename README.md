@@ -184,3 +184,6 @@ ethkey verify \
 ```yaml
 verified: true
 ```
+
+## references
+* [goerli faucet](https://goerlifaucet.com/)
