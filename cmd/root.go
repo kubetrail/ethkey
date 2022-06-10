@@ -60,6 +60,25 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	f.String(flags.OutputFormat, "native", "Output format (native, json, yaml)")
+
+	_ = rootCmd.RegisterFlagCompletionFunc(
+		flags.OutputFormat,
+		func(
+			cmd *cobra.Command,
+			args []string,
+			toComplete string,
+		) (
+			[]string,
+			cobra.ShellCompDirective,
+		) {
+			return []string{
+					flags.OutputFormatNative,
+					flags.OutputFormatJson,
+					flags.OutputFormatYaml,
+				},
+				cobra.ShellCompDirectiveDefault
+		},
+	)
 }
 
 // initConfig reads in config file and ENV variables if set.
